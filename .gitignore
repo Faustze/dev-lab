@@ -1,21 +1,15 @@
-# бинарники
-/cli/cli
-/service/service
-*.exe
+# сборка
 bin/
-
-# зависимости
-vendor/
+obj/
+*.user
 
 # окружение и секреты
 .env
+appsettings.*.local.json
 *.local
 
-# покрытие и профили
-*.out
-*.test
-*.prof
-*.pprof
-
-# результаты прогонов вне замеров
-/tmp/
+# профили и покрытие
+*.nettrace
+*.speedscope.json
+coverage*/
+TestResults/
