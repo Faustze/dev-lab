@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Cli.Models;
 
 namespace Cli;
