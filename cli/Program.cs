@@ -1,37 +1,11 @@
 using Cli.Models;
+using Cli.Storage;
 
 namespace Cli;
 
 public class Program
 {
-    static TaskItem CreateTaskItem(
-        string title,
-        TaskItemPriority priority = TaskItemPriority.Middle,
-        TaskItemStatus status = TaskItemStatus.InProgress,
-        string? description = null
-    )
-    {
-        return new TaskItem
-        {
-            Title = title,
-            Status = status,
-            Priority = priority,
-            Description = description,
-        };
-    }
-
-    static List<TaskItem> CreateSampleTasks() =>
-        new()
-        {
-            CreateTaskItem(
-                "Todo1",
-                TaskItemPriority.High,
-                TaskItemStatus.InProgress,
-                "description1"
-            ),
-            CreateTaskItem("Todo2", TaskItemPriority.Middle, TaskItemStatus.Done, "description2"),
-            CreateTaskItem("Todo3", TaskItemPriority.Low, TaskItemStatus.Canceled, "description3"),
-        };
+    private static readonly TaskMemoryStorage _storage = new();
 
     static void ShowTasks(List<TaskItem> tasks)
     {
@@ -39,6 +13,13 @@ public class Program
             Console.WriteLine(t);
 
         Console.WriteLine($"Tasks count: {tasks.Count}");
+    }
+
+    static void CreateMockTasks(TaskMemoryStorage storage)
+    {
+        storage.Add("Todo1", TaskItemPriority.High, TaskItemStatus.InProgress, "description1");
+        storage.Add("Todo2", TaskItemPriority.Middle, TaskItemStatus.Done, "description2");
+        storage.Add("Todo3", TaskItemPriority.Low, TaskItemStatus.Canceled, "description3");
     }
 
     public static int Main(string[] args)
@@ -50,6 +31,9 @@ public class Program
             );
             return 1;
         }
+
+        CreateMockTasks(_storage);
+
         switch (args[0])
         {
             case "add":
@@ -98,13 +82,13 @@ public class Program
                         description = args[i];
                     }
                 }
-                TaskItem t = CreateTaskItem(title, priority, status, description);
+                TaskItem t = _storage.Add(title, priority, status, description);
                 Console.WriteLine(t);
                 return 0;
             }
 
             case "list":
-                ShowTasks(CreateSampleTasks());
+                ShowTasks(_storage.GetAll());
                 return 0;
 
             default:
