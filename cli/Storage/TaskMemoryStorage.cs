@@ -7,7 +7,6 @@ public class TaskMemoryStorage : ITaskStorage
 {
     private readonly List<TaskItem> _tasks = new();
     private readonly string _filePath;
-
     public TaskMemoryStorage(string filePath)
     {
         _filePath = filePath;
@@ -30,7 +29,9 @@ public class TaskMemoryStorage : ITaskStorage
 
     public (TaskItem? task, int matchCount) GetByIdPrefix(string idPrefix)
     {
-        var matches = _tasks.Where(t => t.Id.ToString().StartsWith(idPrefix, StringComparison.OrdinalIgnoreCase)).ToList();
+        var matches = _tasks
+            .Where(t => t.Id.ToString().StartsWith(idPrefix, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         return (matches.Count == 1 ? matches[0] : null, matches.Count);
     }
 
@@ -74,7 +75,9 @@ public class TaskMemoryStorage : ITaskStorage
         if (count == 0)
             throw new InvalidOperationException($"Task '{id}' not found.");
         if (task is null)
-            throw new InvalidOperationException($"Ambiguous identifier '{id}' — matches {count} tasks.");
+            throw new InvalidOperationException(
+                $"Ambiguous identifier '{id}' — matches {count} tasks."
+            );
         task.Status = TaskItemStatus.Done;
         task.UpdatedAtUtc = DateTimeOffset.UtcNow;
         return task;
@@ -86,7 +89,9 @@ public class TaskMemoryStorage : ITaskStorage
         if (count == 0)
             throw new InvalidOperationException($"Task '{id}' not found.");
         if (task is null)
-            throw new InvalidOperationException($"Ambiguous identifier '{id}' — matches {count} tasks.");
+            throw new InvalidOperationException(
+                $"Ambiguous identifier '{id}' — matches {count} tasks."
+            );
         _tasks.RemoveAll(t => t.Id == task.Id);
         return task;
     }
@@ -95,7 +100,7 @@ public class TaskMemoryStorage : ITaskStorage
     {
         var options = new JsonSerializerOptions(JsonOptionsProvider.Options)
         {
-            WriteIndented = true
+            WriteIndented = true,
         };
         string json = JsonSerializer.Serialize(_tasks, options);
         File.WriteAllText(_filePath, json);

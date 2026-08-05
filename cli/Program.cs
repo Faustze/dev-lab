@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Cli.Models;
 using Cli.Storage;
+using Cli.Utils;
 
 namespace Cli;
 
@@ -22,7 +23,12 @@ public class Program
         }
         catch (FileNotFoundException ex)
         {
-            Console.Error.WriteLine($"Json file {ex.FileName} not found. Recreated.");
+            Console.Error.WriteLine(
+                $"""
+                Json file {ex.FileName} not found. Recreated.
+                =======================================================
+                """
+            );
             CreateMockTasksJsonFile();
             json = File.ReadAllText(MockFilePath);
             _storage.LoadFromJson(json);
@@ -50,7 +56,7 @@ public class Program
             new TaskItem
             {
                 Title = "Implement JSON storage",
-                Priority = TaskItemPriority.High,
+                Priority = TaskItemPriority.Middle,
                 Description = "Add file-based persistence for tasks",
             },
             new TaskItem
@@ -78,10 +84,12 @@ public class Program
         }
 
         const int idLen = 8;
-        Console.WriteLine($"{"ID", -8}  {"Title", -30}  {"Priority"}");
-        Console.WriteLine(new string('-', idLen + 2 + 30 + 2 + 10));
+        Console.WriteLine($"{"ID", -8}  {"Title", -30}  {"Priority", -10} {"Status"}");
+        Console.WriteLine(new string('-', idLen + 2 + 30 + 2 + 10 + 10));
         foreach (TaskItem t in tasks)
-            Console.WriteLine($"{t.Id.ToString()[..idLen], -8}  {t.Title, -30}  {t.Priority}");
+            Console.WriteLine(
+                $"{t.Id.ToString()[..idLen], -8}  {t.Title, -30}  {t.Priority, -10} {t.Status}"
+            );
     }
 
     static bool IsValidIdArg(string arg)
@@ -94,7 +102,7 @@ public class Program
         if (args.Length == 0)
         {
             Console.Error.WriteLine(
-                "Usage: cli <command> [args]\n\nCommands:\n  add <title> [--priority=low|middle|high]\n  list [--all]\n  done <id>\n  rm <id>"
+                "Usage: cli <command> [args]\n\nCommands:\n  add <title> [--priority=low|middle|high]\n  list [--all] [--sort=asc|desc]\n  done <id>\n  rm <id>"
             );
             return 1;
         }
@@ -143,10 +151,47 @@ public class Program
 
             case "list":
             {
-                bool all = args.Length > 1 && args[1] == "--all";
+                bool all = false;
+                SortDirection? dir = null;
+
+                for (int i = 1; i < args.Length; i++)
+                {
+                    if (args[i] == "--all")
+                    {
+                        all = true;
+                    }
+                    else if (args[i].StartsWith("--sort="))
+                    {
+                        string rawValue = args[i].Split('=')[1];
+                        if (
+                            Enum.TryParse<SortDirection>(
+                                rawValue,
+                                true,
+                                out SortDirection parsedDir
+                            )
+                        )
+                        {
+                            dir = parsedDir;
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine(
+                                $"Invalid sort value: {rawValue}. Valid values: asc, desc"
+                            );
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Unknown flag: {args[i]}");
+                        return 1;
+                    }
+                }
                 List<TaskItem> tasks = all
                     ? _storage.GetAll()
                     : _storage.GetAllFiltered(TaskItemStatus.InProgress);
+                if (dir is not null)
+                    tasks = SortBy.SortByPriority(tasks, dir.Value);
                 ShowTasks(tasks);
                 return 0;
             }
