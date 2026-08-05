@@ -9,16 +9,32 @@ public class Program
     private static readonly string MockFilePath = "Mocks/_tasks.json";
     private static TaskMemoryStorage _storage = null!;
 
-    static void EnsureMockTasksFileExists()
+    static bool EnsureMockTasksFileExists()
     {
-        if (!File.Exists(MockFilePath) || new FileInfo(MockFilePath).Length == 0)
-        {
-            CreateMockTasksJsonFile();
-        }
-
         _storage = new TaskMemoryStorage(MockFilePath);
-        string json = File.ReadAllText(MockFilePath);
-        _storage.LoadFromJson(json);
+
+        string json;
+        try
+        {
+            json = File.ReadAllText(MockFilePath);
+            _storage.LoadFromJson(json);
+            return true;
+        }
+        catch (FileNotFoundException ex)
+        {
+            Console.Error.WriteLine($"Json file {ex.FileName} not found. Recreated.");
+            CreateMockTasksJsonFile();
+            json = File.ReadAllText(MockFilePath);
+            _storage.LoadFromJson(json);
+            return true;
+        }
+        catch (JsonException)
+        {
+            Console.Error.WriteLine(
+                $"Json file is damaged. Correct it here: '{MockFilePath}' and launch again."
+            );
+            return false;
+        }
     }
 
     static void CreateMockTasksJsonFile()
@@ -48,7 +64,7 @@ public class Program
 
         var options = new JsonSerializerOptions(JsonOptionsProvider.Options)
         {
-            WriteIndented = true
+            WriteIndented = true,
         };
         File.WriteAllText(MockFilePath, JsonSerializer.Serialize(tasks, options));
     }
@@ -83,7 +99,8 @@ public class Program
             return 1;
         }
 
-        EnsureMockTasksFileExists();
+        if (!EnsureMockTasksFileExists())
+            return 1;
 
         switch (args[0])
         {

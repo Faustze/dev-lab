@@ -1,31 +1,31 @@
 [
   {
-    "Id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "Id": "4235100b-3fd7-434e-87fe-3ceb070d2b75",
     "Title": "Setup project structure",
     "Status": "in-progress",
     "Priority": "high",
-    "CreatedAtUtc": "2026-01-15T10:00:00+00:00",
-    "UpdatedAtUtc": "2026-01-15T10:00:00+00:00",
+    "CreatedAtUtc": "2026-08-05T09:17:54.9342811+00:00",
+    "UpdatedAtUtc": "2026-08-05T09:17:54.9342811+00:00",
     "Description": "Initialize CLI project with Models, Storage, and Program",
     "TagId": null
   },
   {
-    "Id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+    "Id": "1a36154c-f656-435f-97c6-1f79e587023d",
     "Title": "Implement JSON storage",
     "Status": "in-progress",
     "Priority": "high",
-    "CreatedAtUtc": "2026-01-16T14:30:00+00:00",
-    "UpdatedAtUtc": "2026-01-16T14:30:00+00:00",
+    "CreatedAtUtc": "2026-08-05T09:17:54.9345441+00:00",
+    "UpdatedAtUtc": "2026-08-05T09:17:54.9345441+00:00",
     "Description": "Add file-based persistence for tasks",
     "TagId": null
   },
   {
-    "Id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+    "Id": "8d3b9bf5-1476-4a19-abee-ef9de5744690",
     "Title": "Add command parsing",
     "Status": "done",
     "Priority": "low",
-    "CreatedAtUtc": "2026-01-17T09:15:00+00:00",
-    "UpdatedAtUtc": "2026-01-17T16:45:00+00:00",
+    "CreatedAtUtc": "2026-08-05T09:17:54.9345456+00:00",
+    "UpdatedAtUtc": "2026-08-05T09:17:54.9345456+00:00",
     "Description": "Parse add/list/done/remove commands with flags",
     "TagId": null
   }
